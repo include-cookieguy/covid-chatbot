@@ -16,6 +16,7 @@ from linebot.models import (
     CarouselTemplate, FollowEvent, MessageTemplateAction,
     ButtonsTemplate,
 )
+from training import predict_category
 
 # google_maps
 GOOGLE_API_KEY = 'AIzaSyBVR6SZshxLMkuCqfctP-qpYoM0PpRHkcM'
@@ -23,7 +24,7 @@ GOOGLE_API_KEY = 'AIzaSyBVR6SZshxLMkuCqfctP-qpYoM0PpRHkcM'
 # redis database
 REDIS_HOST = 'localhost'
 REDIS_PASSWORD = None
-REDIS_PORT = '6379'
+REDIS_PORT = 6379
 
 # line bot
 LINE_CHANNEL_SECRET = '03ee235dbfd1933bec1794e374e9eca8'
@@ -40,8 +41,25 @@ HOST = REDIS_HOST
 PWD = REDIS_PASSWORD
 PORT = REDIS_PORT
 
+arr_predict = [
+    "Menu",
+    "Popular science",
+    "Precaution",
+    "More knowledge",
+    "Wash your hand",
+    "Protect others",
+    "Outbreak news",
+    "Situation report",
+    "Latest news",
+    "Myth busters",
+    "Emergency & Donate",
+    "Find hospital",
+    "Donate"
+]
 
-pool = redis.ConnectionPool(host=HOST, password=PWD, port=PORT, decode_responses=True)
+
+pool = redis.ConnectionPool(host=HOST, password=PWD,
+                            port=PORT, decode_responses=True)
 r = redis.Redis(connection_pool=pool)
 app = Flask(__name__)
 # Get Line channel secret and token
@@ -64,6 +82,7 @@ parser = WebhookParser(channel_secret)
 @app.route("/callback", methods=['POST'])
 def callback():
     global events
+    # confirm that request was sent from LINE
     signature = request.headers['X-Line-Signature']
 
     # get request body as text
@@ -133,7 +152,8 @@ def getPrecaution():
 # handel getMoreKnowledge function
 def getMoreKnowledge():
     result = []
-    res = requests.get('https://www.who.int/emergencies/diseases/novel-coronavirus-2019/advice-for-public/videos')
+    res = requests.get(
+        'https://www.who.int/emergencies/diseases/novel-coronavirus-2019/advice-for-public/videos')
     soup = BeautifulSoup(res.text, 'html.parser')
     videos = soup.find('div', attrs={'id': 'PageContent_C054_Col01'})
     for num in range(0, 5):
@@ -165,7 +185,8 @@ def getMoreKnowledge():
 
 # handel getReport function
 def getReport():
-    res = requests.get('https://www.who.int/emergencies/diseases/novel-coronavirus-2019/situation-reports')
+    res = requests.get(
+        'https://www.who.int/emergencies/diseases/novel-coronavirus-2019/situation-reports')
     soup = BeautifulSoup(res.text, 'html.parser')
     sreport = soup.find_all('a', attrs={'target': '_blank'})[5]
     report = str('https://www.who.int' + sreport['href'])
@@ -177,14 +198,16 @@ def getNews():
     result = []
     res = requests.get('https://www.who.int/news-room/releases')
     soup = BeautifulSoup(res.text, 'html.parser')
-    news = soup.find_all('a', {'class': 'link-container'}, limit=5)  # choose 5 news
+    news = soup.find_all(
+        'a', {'class': 'link-container'}, limit=5)  # choose 5 news
     for t in news:
         value = t.attrs
         title = value['aria-label']
         url = 'https://www.who.int/' + value['href']
         column = CarouselColumn(
             title=prepareTitle(title),
-            text='views:' + str(r.incr(title)),  # Calculate the views of News through redis.
+            # Calculate the views of News through redis.
+            text='views:' + str(r.incr(title)),
             actions=[URITemplateAction(
                 label='More',
                 uri=url
@@ -253,9 +276,11 @@ def getDonate():
 # handel MainMenu
 def MainMenu():
     buttons_template = ButtonsTemplate(text='Main services', actions=[
-        MessageTemplateAction(label='1 Popular Science', text='Popular science'),
+        MessageTemplateAction(label='1 Popular Science',
+                              text='Popular science'),
         MessageTemplateAction(label='2 Outbreak News', text='Outbreak news'),
-        MessageTemplateAction(label='3 Emergency & Donate', text='Emergency & Donate'),
+        MessageTemplateAction(label='3 Emergency & Donate',
+                              text='Emergency & Donate'),
     ])
     template_message = TemplateSendMessage(
         alt_text='Menu', template=buttons_template)
@@ -277,7 +302,8 @@ def Menu1():
 # handel sub Menu2
 def Menu2():
     buttons_template = ButtonsTemplate(text='2 News about COVID-2019', actions=[
-        MessageTemplateAction(label='Situation Report', text='Situation report'),
+        MessageTemplateAction(label='Situation Report',
+                              text='Situation report'),
         MessageTemplateAction(label='Latest News', text='Latest news'),
         MessageTemplateAction(label='Myth Busters', text='Myth busters'),
         MessageTemplateAction(label='Main Menu', text='Menu'),
@@ -294,7 +320,7 @@ def Menu3():
         MessageTemplateAction(label='Donate', text='Donate'),
         MessageTemplateAction(label='Main Menu', text='Menu'),
     ])
-    template_message = TemplateSendMessage(
+    template_message = TemplateSendMessage(  # TemplateSendMessage -> send box
         alt_text='Menu3', template=buttons_template)
     return template_message
 
@@ -302,15 +328,18 @@ def Menu3():
 # Handler function for Text Message
 def handle_TextMessage(event):
     print(event.message.text)
-    if event.message.text == 'Menu':
+    predict_index = int(predict_category(event.message.text))
+    predict_res = arr_predict[predict_index - 1]
+
+    if predict_res == 'Menu':
         msg = 'This is main menu: '
         menu = MainMenu()
         line_bot_api.reply_message(
             event.reply_token, [
-                TextSendMessage(msg),
+                TextSendMessage(msg),  # TextSendMessage -> send message
                 menu]
         )
-    elif event.message.text == 'Popular science':
+    elif predict_res == 'Popular science':
         msg = 'This is popular Science knowledge about COVID-2019, what kinds of information you want to know?'
         menu = Menu1()  # Menu1
         line_bot_api.reply_message(
@@ -318,14 +347,14 @@ def handle_TextMessage(event):
                 TextSendMessage(msg),
                 menu]
         )
-    elif event.message.text == 'Precaution':
+    elif predict_res == 'Precaution':
         line_bot_api.reply_message(
             event.reply_token, getPrecaution()
         )
-    elif event.message.text == 'More knowledge':
+    elif predict_res == 'More knowledge':
         line_bot_api.reply_message(
             event.reply_token, getMoreKnowledge())
-    elif event.message.text == 'Wash your hand':
+    elif predict_res == 'Wash your hand':
         line_bot_api.reply_message(
             event.reply_token, [
                 ImageSendMessage(
@@ -341,7 +370,7 @@ def handle_TextMessage(event):
                                       '-media-squares/blue-2.tmb-1920v.png?sfvrsn=2bc43de1_1 '
                 ),
             ])
-    elif event.message.text == 'Protect others':
+    elif predict_res == 'Protect others':
         line_bot_api.reply_message(
             event.reply_token, [
                 ImageSendMessage(
@@ -355,14 +384,14 @@ def handle_TextMessage(event):
                     preview_image_url='https://www.who.int/images/default-source/health-topics/coronavirus/social'
                                       '-media-squares/blue-4.tmb-1920v.png?sfvrsn=a5317377_5')
             ])
-    elif event.message.text == 'Outbreak news':
+    elif predict_res == 'Outbreak news':
         msg = 'This is the latest news about COVID-2019, what kinds of information you want to know? '
         menu = Menu2()  # Menu2
         line_bot_api.reply_message(
             event.reply_token, [
                 TextSendMessage(msg),
                 menu])
-    elif event.message.text == 'Situation report':
+    elif predict_res == 'Situation report':
         msg1 = 'This is the latest situation report, please click:' + getReport()
         msg2 = 'Find more reports please click: https://www.who.int/emergencies/diseases/novel-coronavirus-2019' \
                '/situation-reports '
@@ -370,23 +399,23 @@ def handle_TextMessage(event):
             event.reply_token, [
                 TextSendMessage(msg1),
                 TextSendMessage(msg2)])
-    elif event.message.text == 'Latest news':
+    elif predict_res == 'Latest news':
         line_bot_api.reply_message(
             event.reply_token, getNews())
-    elif event.message.text == 'Myth busters':
+    elif predict_res == 'Myth busters':
         line_bot_api.reply_message(
             event.reply_token, getMythBusters())
-    elif event.message.text == 'Emergency & Donate':
+    elif predict_res == 'Emergency & Donate':
         line_bot_api.reply_message(
             event.reply_token, Menu3())  # Menu3
-    elif event.message.text == 'Find hospital':
+    elif predict_res == 'Find hospital':
         msg = 'Please send your location, thanks.'
         line_bot_api.reply_message(event.reply_token, TextSendMessage(
             text=msg,
             quick_reply=QuickReply(items=[QuickReplyButton(
                 action=LocationAction(label='Send your location'),
-                )])))
-    elif event.message.text == 'Donate':
+            )])))
+    elif predict_res == 'Donate':
         line_bot_api.reply_message(
             event.reply_token, getDonate())
     else:
@@ -410,13 +439,16 @@ def handle_TextMessage(event):
 
 # Handler function for Location Message
 def handle_LocationMessage(event):
-    r.set('my_lat', event.message.latitude)  # use redis to set the user's latitude
-    r.set('my_lon', event.message.longitude)  # use redis to set the user's longitude
+    # use redis to set the user's latitude
+    r.set('my_lat', event.message.latitude)
+    # use redis to set the user's longitude
+    r.set('my_lon', event.message.longitude)
     mylat = float(r.get('my_lat'))
     mylng = float(r.get('my_lon'))
     mylocation = '{}, {}'.format(mylat, mylng)
     # use googlemaps API as a service get the all places results around user's location within 10000m:
-    places_results = gmaps.places_nearby(location=mylocation, type='hospital', radius=10000)
+    places_results = gmaps.places_nearby(
+        location=mylocation, type='hospital', radius=10000)
     # sort the hospital by distance:
     list = []
     for place in places_results['results']:

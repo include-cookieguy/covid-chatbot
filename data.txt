@@ -1,0 +1,13 @@
+1 Menu
+2 Popular science
+3 Precaution
+4 More knowledge
+5 Wash your hand
+6 Protect others
+7 Outbreak news
+8 Situation report
+9 Latest news
+10 Myth busters
+11 Emergency & Donate
+12 Find hospital
+13 Donate
