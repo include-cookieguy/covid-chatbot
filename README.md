@@ -1,3 +1,5 @@
+python -m nltk.downloader punkt
+
 # A Line Chatbot with information about COVID-19
 ## This is a Line chatbot project about sharing public health information.    
 ### The design of our chatbot:    
