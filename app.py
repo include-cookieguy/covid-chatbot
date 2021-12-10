@@ -62,6 +62,7 @@ arr_predict = [
 pool = redis.ConnectionPool(host=HOST, password=PWD,
                             port=PORT, decode_responses=True)
 r = redis.Redis(connection_pool=pool)
+
 app = Flask(__name__)
 # Get Line channel secret and token
 channel_secret = LINE_CHANNEL_SECRET
@@ -99,7 +100,7 @@ def callback():
     # if event is MessageEvent and message is TextMessage, then echo text
     for event in events:
         if isinstance(event, FollowEvent):
-            handel_greeting(event)
+            handle_greeting(event)
         if not isinstance(event, MessageEvent):
             continue
         if isinstance(event.message, TextMessage):
@@ -121,8 +122,8 @@ def callback():
     return 'OK'
 
 
-# handel greeting event
-def handel_greeting(event):
+# handle greeting event
+def handle_greeting(event):
     line_bot_api.reply_message(
         event.reply_token, [
             TextSendMessage(
@@ -132,14 +133,14 @@ def handel_greeting(event):
         ])
 
 
-# handel preparetitle to limit the length of title
+# handle preparetitle to limit the length of title
 def prepareTitle(text):
     result = text[:37] + "..." if len(text) > 40 else text
     result = "{}".format(result)
     return result
 
 
-# handel getPrecaution function
+# handle getPrecaution function
 def getPrecaution():
     buttons_template = ButtonsTemplate(text='Precautions:', actions=[
         MessageTemplateAction(label='Wash your hand', text='Wash your hand'),
@@ -150,7 +151,7 @@ def getPrecaution():
     return template_message
 
 
-# handel getMoreKnowledge function
+# handle getMoreKnowledge function
 def getMoreKnowledge():
     result = []
     res = requests.get(
@@ -184,7 +185,7 @@ def getMoreKnowledge():
     return result
 
 
-# handel getReport function
+# handle getReport function
 def getReport():
     res = requests.get(
         'https://www.who.int/emergencies/diseases/novel-coronavirus-2019/situation-reports')
@@ -194,7 +195,7 @@ def getReport():
     return report
 
 
-# handel getNews function
+# handle getNews function
 def getNews():
     result = []
     res = requests.get('https://www.who.int/news-room/releases')
@@ -227,7 +228,7 @@ def getNews():
     return result
 
 
-# handel getMythBusters function
+# handle getMythBusters function
 def getMythBusters():
     result = []
     res = requests.get(
@@ -254,7 +255,7 @@ def getMythBusters():
     return result
 
 
-# handel getDonate function
+# handle getDonate function
 def getDonate():
     carousel = TemplateSendMessage(
         alt_text="Donate",
@@ -274,7 +275,7 @@ def getDonate():
     return result
 
 
-# handel MainMenu
+# handle MainMenu
 def MainMenu():
     buttons_template = ButtonsTemplate(text='Main services', actions=[
         MessageTemplateAction(label='1 Popular Science',
@@ -288,7 +289,7 @@ def MainMenu():
     return template_message
 
 
-# handel sub Menu1
+# handle sub Menu1
 def Menu1():
     buttons_template = ButtonsTemplate(text='1 Popular science', actions=[
         MessageTemplateAction(label='Precaution', text='Precaution'),
@@ -300,7 +301,7 @@ def Menu1():
     return template_message
 
 
-# handel sub Menu2
+# handle sub Menu2
 def Menu2():
     buttons_template = ButtonsTemplate(text='2 News about COVID-2019', actions=[
         MessageTemplateAction(label='Situation Report',
@@ -314,7 +315,7 @@ def Menu2():
     return template_message
 
 
-# handel sub Menu3
+# handle sub Menu3
 def Menu3():
     buttons_template = ButtonsTemplate(text='Emergency & Donate', actions=[
         MessageTemplateAction(label='Find Hospital', text='Find hospital'),
@@ -330,7 +331,6 @@ def Menu3():
 def handle_TextMessage(event):
     print(event.message.text)
     predict_index = int(predict_category(event.message.text))
-
     predict_res = arr_predict[predict_index]
 
     if predict_res == 'Menu':
