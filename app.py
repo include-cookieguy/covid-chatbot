@@ -1,4 +1,5 @@
 from __future__ import unicode_literals
+import json
 import sys
 import redis
 import requests
@@ -329,7 +330,8 @@ def Menu3():
 def handle_TextMessage(event):
     print(event.message.text)
     predict_index = int(predict_category(event.message.text))
-    predict_res = arr_predict[predict_index - 1]
+
+    predict_res = arr_predict[predict_index]
 
     if predict_res == 'Menu':
         msg = 'This is main menu: '
@@ -445,31 +447,37 @@ def handle_LocationMessage(event):
     r.set('my_lon', event.message.longitude)
     mylat = float(r.get('my_lat'))
     mylng = float(r.get('my_lon'))
-    mylocation = '{}, {}'.format(mylat, mylng)
-    # use googlemaps API as a service get the all places results around user's location within 10000m:
-    places_results = gmaps.places_nearby(
-        location=mylocation, type='hospital', radius=10000)
-    # sort the hospital by distance:
-    list = []
-    for place in places_results['results']:
-        name = place['name']
-        lat = place['geometry']['location']['lat']
-        lng = place['geometry']['location']['lng']
-        address = place['vicinity']
-        distance = ((lat - mylat) ** 2 + (lng - mylng) ** 2) ** 0.5
-        info = distance, name, lat, lng, address
-        list.append(info)
-    list.sort()
-    # get the nearest one:
-    name_ = list[0][1]
-    lat_ = list[0][2]
-    lng_ = list[0][3]
-    address_ = list[0][4]
-    result_text = 'The nearest hospital around you is ' + name_ + '.'
-    result = [TextSendMessage(text=result_text),
-              LocationSendMessage(
-                  title=name_, address=address_,
-                  latitude=lat_, longitude=lng_)]
+    
+    response = requests.post(
+        'https://morning-lake-40448.herokuapp.com/', 
+        json = { "longitude": mylat, "latitude": mylng }
+    )
+    data = response.json()
+
+    # print(data)
+    locations = []
+    for i, ele in enumerate(data):
+        temp = LocationSendMessage( 
+            title = ele['title'],
+            address = ele['address'],
+            latitude = ele['latitude'],
+            longitude = ele['longitude'],
+        )
+        locations.append(temp)
+
+    print('data: ', data)
+    print('location: ', locations)
+
+    result_text = '3 hospital around you'
+    
+    # Line khong cho gui qua 5 phan tu trong 1 tin nhan
+    result = [
+            TextSendMessage(text=result_text),
+            locations[0],
+            locations[1],
+            locations[2],
+    ]
+
     line_bot_api.reply_message(event.reply_token, result)
 
 

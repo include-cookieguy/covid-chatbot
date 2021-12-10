@@ -64,4 +64,5 @@ def predict_category(s, label=label, model_1=model_1, model_2=model_2, model_3=m
     pred_1 = model_1.predict([s])
     pred_2 = model_2.predict([s])
     pred_3 = model_3.predict([s])
-    return pred_1
+    print(pred_1[0], pred_2[0], pred_3[0])
+    return pred_2[0]
