@@ -24,6 +24,7 @@ class SpellCheck:
         data = set(data)
 
         # store all the words into a class variable dictionary
+        data = sorted(data, key=lambda x: -len(x))
         self.dictionary = list(data)
 
     # string setter method

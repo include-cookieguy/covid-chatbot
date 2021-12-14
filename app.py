@@ -57,8 +57,9 @@ arr_predict = [
     "Emergency & Donate",
     "Find hospital",
     "Donate",
+    "Country",
+    "Global",
     "Statistic",
-    "Global"
 ]
 
 
@@ -232,7 +233,7 @@ def getNews():
 
 
 def getStatistic(countryName):
-    if countryName == 'Global' or countryName == 'World' or countryName == None:
+    if countryName == 'Global' or countryName == 'World':
         res = requests.get(
             'https://corona.lmao.ninja/v2/all/')
         world = json.loads(res.text)
@@ -324,6 +325,8 @@ def MainMenu():
         MessageTemplateAction(label='2 Outbreak News', text='Outbreak news'),
         MessageTemplateAction(label='3 Emergency & Donate',
                               text='Emergency & Donate'),
+        MessageTemplateAction(label='4 Statistic',
+                              text='Statistic'),
     ])
     template_message = TemplateSendMessage(
         alt_text='Menu', template=buttons_template)
@@ -366,6 +369,16 @@ def Menu3():
     ])
     template_message = TemplateSendMessage(  # TemplateSendMessage -> send box
         alt_text='Menu3', template=buttons_template)
+    return template_message
+
+# handle sub Statistic menu
+def StatisticMenu():
+    buttons_template = ButtonsTemplate(text='Statistic', actions=[
+        MessageTemplateAction(label='Global statistic', text='Global'),
+        # MessageTemplateAction(label='Country Statistic', text='Country'),
+    ])
+    template_message = TemplateSendMessage(  # TemplateSendMessage -> send box
+        alt_text='StatisticMenu', template=buttons_template)
     return template_message
 
 
@@ -462,12 +475,18 @@ def handle_TextMessage(event):
     elif predict_res == 'Donate':
         line_bot_api.reply_message(
             event.reply_token, getDonate())
-    elif predict_res == 'Statistic' or predict_res == 'Global':
+    elif predict_res == 'Statistic':
+        line_bot_api.reply_message(
+            event.reply_token, StatisticMenu())
+    elif predict_res == 'Country':
         spell_check = SpellCheck('spell\words.txt')
         spell_check.check(event.message.text)
 
         line_bot_api.reply_message(
             event.reply_token, getStatistic(spell_check.suggestions()[0]))
+    elif predict_res == 'Global':
+        line_bot_api.reply_message(
+            event.reply_token, getStatistic('Global'))
     else:
         msg = "Sorry! I don't understand. What kind of the following information you want to know?"
         line_bot_api.reply_message(
