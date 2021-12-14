@@ -55,7 +55,8 @@ arr_predict = [
     "Myth busters",
     "Emergency & Donate",
     "Find hospital",
-    "Donate"
+    "Donate",
+    "Statistic",
 ]
 
 
@@ -228,6 +229,36 @@ def getNews():
     return result
 
 
+def getStatistic():
+    result = []
+    res = requests.get(
+        'https://corona.lmao.ninja/v2/countries?yesterday&sort')
+    json_arr = json.loads(res.text)
+    first_el = json_arr[0]
+    result_text = 'Country: ' + \
+        first_el['country'] + " Cases: " + str(first_el['cases'])
+    # soup = BeautifulSoup(res.text, 'html.parser')
+    # myths = soup.find('div', attrs={'id': 'PageContent_C003_Col01'})
+    # # choose five myth busters
+    # for num in range(1, 6):
+    #     myths_image = myths.select('.link-container')[num]
+    #     url = myths_image['href']
+    #     column = ImageCarouselColumn(
+    #         image_url=str(url),
+    #         action=URITemplateAction(label='Details', uri=url))
+    #     result.append(column)
+    # carousel = TemplateSendMessage(
+    #     alt_text="5 myth busters",
+    #     template=ImageCarouselTemplate(
+    #         columns=result
+    #     )
+    # )
+    # result_text = 'Find more information about myth busters, please click: ' \
+    #               'https://www.who.int/emergencies/diseases/novel-coronavirus-2019/advice-for-public/myth-busters '
+    result = [TextSendMessage(text=result_text)]
+    return result
+
+
 # handle getMythBusters function
 def getMythBusters():
     result = []
@@ -320,6 +351,7 @@ def Menu3():
     buttons_template = ButtonsTemplate(text='Emergency & Donate', actions=[
         MessageTemplateAction(label='Find Hospital', text='Find hospital'),
         MessageTemplateAction(label='Donate', text='Donate'),
+        MessageTemplateAction(label='Statistic', text='Statistic'),
         MessageTemplateAction(label='Main Menu', text='Menu'),
     ])
     template_message = TemplateSendMessage(  # TemplateSendMessage -> send box
@@ -420,6 +452,9 @@ def handle_TextMessage(event):
     elif predict_res == 'Donate':
         line_bot_api.reply_message(
             event.reply_token, getDonate())
+    elif predict_res == 'Statistic':
+        line_bot_api.reply_message(
+            event.reply_token, getStatistic())
     else:
         msg = "Sorry! I don't understand. What kind of the following information you want to know?"
         line_bot_api.reply_message(
@@ -447,21 +482,21 @@ def handle_LocationMessage(event):
     r.set('my_lon', event.message.longitude)
     mylat = float(r.get('my_lat'))
     mylng = float(r.get('my_lon'))
-    
+
     response = requests.post(
-        'https://morning-lake-40448.herokuapp.com/', 
-        json = { "longitude": mylat, "latitude": mylng }
+        'https://morning-lake-40448.herokuapp.com/',
+        json={"longitude": mylat, "latitude": mylng}
     )
     data = response.json()
 
     # print(data)
     locations = []
     for i, ele in enumerate(data):
-        temp = LocationSendMessage( 
-            title = ele['title'],
-            address = ele['address'],
-            latitude = ele['latitude'],
-            longitude = ele['longitude'],
+        temp = LocationSendMessage(
+            title=ele['title'],
+            address=ele['address'],
+            latitude=ele['latitude'],
+            longitude=ele['longitude'],
         )
         locations.append(temp)
 
@@ -469,13 +504,13 @@ def handle_LocationMessage(event):
     print('location: ', locations)
 
     result_text = '3 hospital around you'
-    
+
     # Line khong cho gui qua 5 phan tu trong 1 tin nhan
     result = [
-            TextSendMessage(text=result_text),
-            locations[0],
-            locations[1],
-            locations[2],
+        TextSendMessage(text=result_text),
+        locations[0],
+        locations[1],
+        locations[2],
     ]
 
     line_bot_api.reply_message(event.reply_token, result)
