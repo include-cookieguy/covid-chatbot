@@ -18,6 +18,7 @@ from linebot.models import (
     ButtonsTemplate,
 )
 from training import predict_category
+from spell.spellcheck import SpellCheck
 
 # google_maps
 GOOGLE_API_KEY = 'AIzaSyBVR6SZshxLMkuCqfctP-qpYoM0PpRHkcM'
@@ -229,32 +230,23 @@ def getNews():
     return result
 
 
-def getStatistic():
+def getStatistic(countryName):
     result = []
     res = requests.get(
         'https://corona.lmao.ninja/v2/countries?yesterday&sort')
     json_arr = json.loads(res.text)
-    first_el = json_arr[0]
+    def getCountry(x):
+        if x['country'] == countryName:
+            return True
+        else:
+            return False
+    country = None
+    cList = filter(getCountry, json_arr)
+    for c in cList:
+        country = c
+    print(country)
     result_text = 'Country: ' + \
-        first_el['country'] + " Cases: " + str(first_el['cases'])
-    # soup = BeautifulSoup(res.text, 'html.parser')
-    # myths = soup.find('div', attrs={'id': 'PageContent_C003_Col01'})
-    # # choose five myth busters
-    # for num in range(1, 6):
-    #     myths_image = myths.select('.link-container')[num]
-    #     url = myths_image['href']
-    #     column = ImageCarouselColumn(
-    #         image_url=str(url),
-    #         action=URITemplateAction(label='Details', uri=url))
-    #     result.append(column)
-    # carousel = TemplateSendMessage(
-    #     alt_text="5 myth busters",
-    #     template=ImageCarouselTemplate(
-    #         columns=result
-    #     )
-    # )
-    # result_text = 'Find more information about myth busters, please click: ' \
-    #               'https://www.who.int/emergencies/diseases/novel-coronavirus-2019/advice-for-public/myth-busters '
+        country['country'] + " Cases: " + str(country['cases'])
     result = [TextSendMessage(text=result_text)]
     return result
 
@@ -453,8 +445,11 @@ def handle_TextMessage(event):
         line_bot_api.reply_message(
             event.reply_token, getDonate())
     elif predict_res == 'Statistic':
+        spell_check = SpellCheck('spell\words.txt')
+        spell_check.check(event.message.text)
+
         line_bot_api.reply_message(
-            event.reply_token, getStatistic())
+            event.reply_token, getStatistic(spell_check.suggestions()[0]))
     else:
         msg = "Sorry! I don't understand. What kind of the following information you want to know?"
         line_bot_api.reply_message(
