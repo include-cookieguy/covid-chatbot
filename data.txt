@@ -11,4 +11,5 @@
 10 Emergency and Donate. 
 11 Find hospital. find hospital near me? I want to find hospital near me? hospital hospital? What is hospital near me? find hospital near me find hospital near me find hospital near me find hospital near me find hospital near me find hospital near me find hospital near me
 12 Donate. I want to donate to some charity? donate donate donate donate donate donate donate donation donation donation donation donation donation donation 
-13 Statistic. What about statistic today? How about statistic? statistic of Covid-19? statistic statistic statistic statistic statistic statistic statistic 
+13 Statistic. What about statistic today? How about statistic? statistic of Covid-19? I want to know how many cases are there in  today? How many cases does have today? What is the number of cases in today? Statistic Statistic Statistic Statistic Statistic
+14 GlobalStatic Global global global case total case total total total total world world world world world

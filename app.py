@@ -58,6 +58,7 @@ arr_predict = [
     "Find hospital",
     "Donate",
     "Statistic",
+    "Global"
 ]
 
 
@@ -231,23 +232,40 @@ def getNews():
 
 
 def getStatistic(countryName):
-    result = []
-    res = requests.get(
-        'https://corona.lmao.ninja/v2/countries?yesterday&sort')
-    json_arr = json.loads(res.text)
-    def getCountry(x):
-        if x['country'] == countryName:
-            return True
-        else:
-            return False
-    country = None
-    cList = filter(getCountry, json_arr)
-    for c in cList:
-        country = c
-    print(country)
-    result_text = 'Country: ' + \
-        country['country'] + " Cases: " + str(country['cases'])
-    result = [TextSendMessage(text=result_text)]
+    if countryName == 'Global' or countryName == 'World' or countryName == None:
+        res = requests.get(
+            'https://corona.lmao.ninja/v2/all/')
+        world = json.loads(res.text)
+        result_text = 'Global Covid data: ' + \
+            '\nCases: ' + str(world['cases']) + \
+            '\nToday cases: ' + str(world['todayCases']) + \
+            '\nDeaths: ' + str(world['deaths']) + \
+            '\nToday deaths: ' + str(world['todayDeaths']) + \
+            '\nRecovered: ' + str(world['recovered']) + \
+            '\nToday recovered: ' + str(world['todayRecovered'])
+        flagUrl = 'https://www.nasa.gov/sites/default/files/1-bluemarble_west.jpg'
+        flag = ImageSendMessage(
+                        original_content_url=flagUrl,
+                        preview_image_url=flagUrl)
+        result = [flag, TextSendMessage(text=result_text)]
+    else:
+        result = []
+        res = requests.get(
+            'https://corona.lmao.ninja/v2/countries/' + countryName)
+        country = json.loads(res.text)
+        print(country)
+        result_text = 'Country: ' + \
+            country['country'] + \
+            "\nCases: " + str(country['cases']) + \
+            "\nTodayCases: " + str(country['todayCases']) + \
+            "\nDeaths: " + str(country['deaths']) + \
+            "\nTodayDeaths: " + str(country['todayDeaths']) + \
+            "\nRecovered: " + str(country['recovered']) + \
+            "\nTodayRecovered: " + str(country['todayRecovered'])
+        flag = ImageSendMessage(
+                        original_content_url=country['countryInfo']['flag'],
+                        preview_image_url=country['countryInfo']['flag'])
+        result = [flag, TextSendMessage(text=result_text)]
     return result
 
 
@@ -444,7 +462,7 @@ def handle_TextMessage(event):
     elif predict_res == 'Donate':
         line_bot_api.reply_message(
             event.reply_token, getDonate())
-    elif predict_res == 'Statistic':
+    elif predict_res == 'Statistic' or predict_res == 'Global':
         spell_check = SpellCheck('spell\words.txt')
         spell_check.check(event.message.text)
 
