@@ -5,9 +5,9 @@ from spellcheck import SpellCheck
 spell_check = SpellCheck('words.txt')
 
 # set the string
-string_to_be_checked = "enlan is the country which I want to see the satistic cases"
+string_to_be_checked = "how many case in vietnam"
 spell_check.check(string_to_be_checked)
 
 # print suggestions and correction
-print(spell_check.suggestions())
+print(spell_check.suggestions()[0])
 print(spell_check.correct())
