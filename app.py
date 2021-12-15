@@ -29,8 +29,8 @@ REDIS_PASSWORD = None
 REDIS_PORT = 6379
 
 # line bot
-LINE_CHANNEL_SECRET = '03ee235dbfd1933bec1794e374e9eca8'
-LINE_CHANNEL_ACCESS_TOKEN = 'JeXHXi+mRu4EbCjbginNHVDwvL01VXATrJI3jzUn7Brw45/FH6RwfEg512kZzv9THeN2W28ZJUzQPbDIzxp9zBeCHmN0Zk62CZF1mAM0u/y6I8UoBLcBpFRDZcqVzbl1Gpc9WRaVjL6TNovwWw9taQdB04t89/1O/w1cDnyilFU='
+LINE_CHANNEL_SECRET = '41897b9f6d2b35d09d295d996b6f73ff'
+LINE_CHANNEL_ACCESS_TOKEN = 'Pvuhf3MdOaBBEVVERtswnybxPIfpXIDYbxMwNMV1abrI2kYwDI7YZdHqR5xxGSiYL5dvfUK5y74vqFeu/+VFWkH8umWNjhWND+bvIOAZl4HTwE1gLwDDEKvZ2ajxZWPTpOVpV4niz23veIeM+TVPOQdB04t89/1O/w1cDnyilFU='
 
 # deploy heroku
 PORT = ''
@@ -278,9 +278,12 @@ def getMythBusters():
     soup = BeautifulSoup(res.text, 'html.parser')
     myths = soup.find('div', attrs={'id': 'PageContent_C003_Col01'})
     # choose five myth busters
-    for num in range(1, 6):
+    for num in range(1, 8):
         myths_image = myths.select('.link-container')[num]
         url = myths_image['href']
+        check = url.split(':')[0]
+        if check != 'https':
+            continue
         column = ImageCarouselColumn(
             image_url=str(url),
             action=URITemplateAction(label='Details', uri=url))
@@ -364,7 +367,6 @@ def Menu3():
     buttons_template = ButtonsTemplate(text='Emergency & Donate', actions=[
         MessageTemplateAction(label='Find Hospital', text='Find hospital'),
         MessageTemplateAction(label='Donate', text='Donate'),
-        MessageTemplateAction(label='Statistic', text='Statistic'),
         MessageTemplateAction(label='Main Menu', text='Menu'),
     ])
     template_message = TemplateSendMessage(  # TemplateSendMessage -> send box
