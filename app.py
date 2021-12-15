@@ -29,8 +29,13 @@ REDIS_PASSWORD = None
 REDIS_PORT = 6379
 
 # line bot
+<<<<<<< HEAD
 LINE_CHANNEL_SECRET = '214d08000517e816bc530fad9ddb8be8'
 LINE_CHANNEL_ACCESS_TOKEN = 'sbsJXdNTV3LqDPisIbdLL94VJS25MS6k5miVrsQuwtcwero7sLZTX7AriXc/5HhN5fi22UD7+PDjjjFxR0HWn2uFrBJ0jeeUEmneIuOMqoL4Ibe/1dJ2tYwgH7T6O80tubtRXQIe1qQ0xhsgvNklgQdB04t89/1O/w1cDnyilFU='
+=======
+LINE_CHANNEL_SECRET = '41897b9f6d2b35d09d295d996b6f73ff'
+LINE_CHANNEL_ACCESS_TOKEN = 'Pvuhf3MdOaBBEVVERtswnybxPIfpXIDYbxMwNMV1abrI2kYwDI7YZdHqR5xxGSiYL5dvfUK5y74vqFeu/+VFWkH8umWNjhWND+bvIOAZl4HTwE1gLwDDEKvZ2ajxZWPTpOVpV4niz23veIeM+TVPOQdB04t89/1O/w1cDnyilFU='
+>>>>>>> b8884d5c325c91cf00690b1c5acd131e51e681d7
 
 # deploy heroku
 PORT = ''
@@ -278,9 +283,16 @@ def getMythBusters():
     soup = BeautifulSoup(res.text, 'html.parser')
     myths = soup.find('div', attrs={'id': 'PageContent_C003_Col01'})
     # choose five myth busters
+<<<<<<< HEAD
     for num in range(1, 1):
+=======
+    for num in range(1, 8):
+>>>>>>> b8884d5c325c91cf00690b1c5acd131e51e681d7
         myths_image = myths.select('.link-container')[num]
         url = myths_image['href']
+        check = url.split(':')[0]
+        if check != 'https':
+            continue
         column = ImageCarouselColumn(
             image_url=str(url),
             action=URITemplateAction(label='Details', uri=url))
@@ -374,7 +386,6 @@ def Menu3():
     buttons_template = ButtonsTemplate(text='Emergency & Donate', actions=[
         MessageTemplateAction(label='Find Hospital', text='Find hospital'),
         MessageTemplateAction(label='Donate', text='Donate'),
-        MessageTemplateAction(label='Statistic', text='Statistic'),
         MessageTemplateAction(label='Main Menu', text='Menu'),
     ])
     template_message = TemplateSendMessage(  # TemplateSendMessage -> send box
