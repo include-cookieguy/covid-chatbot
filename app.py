@@ -29,8 +29,8 @@ REDIS_PASSWORD = None
 REDIS_PORT = 6379
 
 # line bot
-LINE_CHANNEL_SECRET = '03ee235dbfd1933bec1794e374e9eca8'
-LINE_CHANNEL_ACCESS_TOKEN = 'JeXHXi+mRu4EbCjbginNHVDwvL01VXATrJI3jzUn7Brw45/FH6RwfEg512kZzv9THeN2W28ZJUzQPbDIzxp9zBeCHmN0Zk62CZF1mAM0u/y6I8UoBLcBpFRDZcqVzbl1Gpc9WRaVjL6TNovwWw9taQdB04t89/1O/w1cDnyilFU='
+LINE_CHANNEL_SECRET = '214d08000517e816bc530fad9ddb8be8'
+LINE_CHANNEL_ACCESS_TOKEN = 'sbsJXdNTV3LqDPisIbdLL94VJS25MS6k5miVrsQuwtcwero7sLZTX7AriXc/5HhN5fi22UD7+PDjjjFxR0HWn2uFrBJ0jeeUEmneIuOMqoL4Ibe/1dJ2tYwgH7T6O80tubtRXQIe1qQ0xhsgvNklgQdB04t89/1O/w1cDnyilFU='
 
 # deploy heroku
 PORT = ''
@@ -278,7 +278,7 @@ def getMythBusters():
     soup = BeautifulSoup(res.text, 'html.parser')
     myths = soup.find('div', attrs={'id': 'PageContent_C003_Col01'})
     # choose five myth busters
-    for num in range(1, 6):
+    for num in range(1, 1):
         myths_image = myths.select('.link-container')[num]
         url = myths_image['href']
         column = ImageCarouselColumn(
@@ -304,10 +304,20 @@ def getDonate():
         template=ButtonsTemplate(
             title='Help Fight Coronavirus',
             text='This donation is for COVID-19 Solidarity Response Fund',
-            actions=[URITemplateAction(
-                label='Go to donate',
+            actions=[
+            URITemplateAction(
+                label='Donate to WHO',
                 uri='https://covid19responsefund.org/'
-            )]
+            ),
+            URITemplateAction(
+                label='Donate to Africa',
+                uri='http://feedafricafoundation.org/?gclid=Cj0KCQiAnuGNBhCPARIsACbnLzpD-Jm-9pIjrbRqJVyusgvxcGTHwPpAgfP71BOhDr0SUVBbp-YOgO8aAoyREALw_wcB'
+            ),
+            URITemplateAction(
+                label='Donate to Covid Fund',
+                uri='https://quyvacxincovid19.gov.vn/eng'
+            )
+            ]
         )
     )
     result_text = 'Attention! This donation is from WHO(World Health Organization) and has nothing to do with the ' \
