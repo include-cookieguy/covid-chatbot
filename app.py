@@ -1,6 +1,8 @@
 from __future__ import unicode_literals
 import json
+import random
 import sys
+from nltk.util import pr
 import redis
 import requests
 from bs4 import BeautifulSoup
@@ -57,6 +59,8 @@ arr_predict = [
     "Emergency & Donate",
     "Find hospital",
     "Donate",
+    "Country",
+    "Global",
     "Statistic",
 ]
 
@@ -200,18 +204,37 @@ def getReport():
 # handle getNews function
 def getNews():
     result = []
-    res = requests.get('https://www.who.int/news-room/releases')
+    arr_img = ['https://indaily.com.au/wp-content/uploads/2020/06/20200606001472614645-original-min-scaled.jpg', 'https://images.financialexpress.com/2021/11/Shanghai-Railway-Station-Reuters-photo.jpg',
+               'https://img.rasset.ie/001a10bf-600.jpg', 'https://news.mit.edu/sites/default/files/styles/news_article__image_gallery/public/images/202005/covid-19-4971811_MITGOVLAB.png?itok=VvUib4z9']
+    res = requests.get(
+        'https://www.cbc.ca/news/covid-19')
     soup = BeautifulSoup(res.text, 'html.parser')
-    news = soup.find_all(
-        'a', {'class': 'link-container'}, limit=5)  # choose 5 news
-    for t in news:
-        value = t.attrs
-        title = value['aria-label']
-        url = 'https://www.who.int/' + value['href']
+    div_news = soup.find('div', attrs={
+        'class': 'contentArea'})
+    a_news = div_news.find_all('a', attrs={'class': 'card'}, limit=6)
+    for a_tag in a_news:
+        value = a_tag.attrs
+        url = 'https://www.cbc.ca/news' + value['href']
+        img_div = a_tag.find('div', attrs={'class': 'placeholder'})
+        img_src = img_div.find('img')['src']
+        title_temp = a_tag.find('h3', attrs={'class': 'headline'}).getText()
+        desc_tag = a_tag.find('div', attrs={'class': 'description'})
+        if desc_tag == None:
+            desc_temp = title_temp
+        else:
+            desc_temp = desc_tag.getText()
+
+        if img_div == None:
+            img_src = random.choice(arr_img)
+        title_news = title_temp[:37] + \
+            "..." if len(title_temp) > 40 else title_temp
+        desc_news = desc_temp[:37] + \
+            "..." if len(desc_temp) > 40 else desc_temp
         column = CarouselColumn(
-            title=prepareTitle(title),
+            title=title_news,
             # Calculate the views of News through redis.
-            text='views:' + str(r.incr(title)),
+            thumbnail_image_url=img_src,
+            text=desc_news,
             actions=[URITemplateAction(
                 label='More',
                 uri=url
@@ -219,35 +242,52 @@ def getNews():
         )
         result.append(column)
     carousel = TemplateSendMessage(
-        alt_text="5 latest news",
+        alt_text="6 latest news",
         template=CarouselTemplate(
             columns=result
         )
     )
     result_text = 'Find more information about coronavirus, please click: ' \
-                  'https://www.who.int/emergencies/diseases/novel-coronavirus-2019 '
+                  'https://www.cbc.ca/news/covid-19'
     result = [carousel, TextSendMessage(text=result_text)]
     return result
 
 
 def getStatistic(countryName):
-    result = []
-    res = requests.get(
-        'https://corona.lmao.ninja/v2/countries?yesterday&sort')
-    json_arr = json.loads(res.text)
-    def getCountry(x):
-        if x['country'] == countryName:
-            return True
-        else:
-            return False
-    country = None
-    cList = filter(getCountry, json_arr)
-    for c in cList:
-        country = c
-    print(country)
-    result_text = 'Country: ' + \
-        country['country'] + " Cases: " + str(country['cases'])
-    result = [TextSendMessage(text=result_text)]
+    if countryName == 'Global' or countryName == 'World':
+        res = requests.get(
+            'https://corona.lmao.ninja/v2/all/')
+        world = json.loads(res.text)
+        result_text = 'Global Covid data: ' + \
+            '\nCases: ' + str(world['cases']) + \
+            '\nToday cases: ' + str(world['todayCases']) + \
+            '\nDeaths: ' + str(world['deaths']) + \
+            '\nToday deaths: ' + str(world['todayDeaths']) + \
+            '\nRecovered: ' + str(world['recovered']) + \
+            '\nToday recovered: ' + str(world['todayRecovered'])
+        flagUrl = 'https://www.nasa.gov/sites/default/files/1-bluemarble_west.jpg'
+        flag = ImageSendMessage(
+            original_content_url=flagUrl,
+            preview_image_url=flagUrl)
+        result = [flag, TextSendMessage(text=result_text)]
+    else:
+        result = []
+        res = requests.get(
+            'https://corona.lmao.ninja/v2/countries/' + countryName)
+        country = json.loads(res.text)
+        print(country)
+        result_text = 'Country: ' + \
+            country['country'] + \
+            "\nCases: " + str(country['cases']) + \
+            "\nTodayCases: " + str(country['todayCases']) + \
+            "\nDeaths: " + str(country['deaths']) + \
+            "\nTodayDeaths: " + str(country['todayDeaths']) + \
+            "\nRecovered: " + str(country['recovered']) + \
+            "\nTodayRecovered: " + str(country['todayRecovered'])
+        flag = ImageSendMessage(
+            original_content_url=country['countryInfo']['flag'],
+            preview_image_url=country['countryInfo']['flag'])
+        result = [flag, TextSendMessage(text=result_text)]
     return result
 
 
@@ -306,6 +346,8 @@ def MainMenu():
         MessageTemplateAction(label='2 Outbreak News', text='Outbreak news'),
         MessageTemplateAction(label='3 Emergency & Donate',
                               text='Emergency & Donate'),
+        MessageTemplateAction(label='4 Statistic',
+                              text='Statistic'),
     ])
     template_message = TemplateSendMessage(
         alt_text='Menu', template=buttons_template)
@@ -348,6 +390,18 @@ def Menu3():
     ])
     template_message = TemplateSendMessage(  # TemplateSendMessage -> send box
         alt_text='Menu3', template=buttons_template)
+    return template_message
+
+# handle sub Statistic menu
+
+
+def StatisticMenu():
+    buttons_template = ButtonsTemplate(text='Statistic', actions=[
+        MessageTemplateAction(label='Global statistic', text='Global'),
+        # MessageTemplateAction(label='Country Statistic', text='Country'),
+    ])
+    template_message = TemplateSendMessage(  # TemplateSendMessage -> send box
+        alt_text='StatisticMenu', template=buttons_template)
     return template_message
 
 
@@ -445,11 +499,17 @@ def handle_TextMessage(event):
         line_bot_api.reply_message(
             event.reply_token, getDonate())
     elif predict_res == 'Statistic':
+        line_bot_api.reply_message(
+            event.reply_token, StatisticMenu())
+    elif predict_res == 'Country':
         spell_check = SpellCheck('spell\words.txt')
         spell_check.check(event.message.text)
 
         line_bot_api.reply_message(
             event.reply_token, getStatistic(spell_check.suggestions()[0]))
+    elif predict_res == 'Global':
+        line_bot_api.reply_message(
+            event.reply_token, getStatistic('Global'))
     else:
         msg = "Sorry! I don't understand. What kind of the following information you want to know?"
         line_bot_api.reply_message(
