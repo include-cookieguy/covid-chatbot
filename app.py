@@ -5,6 +5,8 @@ import sys
 from nltk.util import pr
 import redis
 import requests
+import csv
+import io
 from bs4 import BeautifulSoup
 import googlemaps
 from argparse import ArgumentParser
@@ -85,6 +87,10 @@ if channel_access_token is None:
 
 line_bot_api = LineBotApi(channel_access_token)
 parser = WebhookParser(channel_secret)
+
+# GET VACCINE API
+url = 'https://raw.githubusercontent.com/BloombergGraphics/covid-vaccine-tracker-data/master/data/current-global.csv'
+r = requests.get(url)
 
 
 @app.route("/callback", methods=['POST'])
@@ -257,17 +263,41 @@ def getNews():
 
 
 def getStatistic(countryName):
+    res = requests.get(
+        'https://corona.lmao.ninja/v2/countries/' + countryName)
+    buff = io.StringIO(r.text)
+    dr = csv.DictReader(buff)
     if countryName == 'Global' or countryName == 'World':
+        totalDose = 0
+        peopleDose = 0
+        completeDose = 0
+        for row in dr:
+            totalDose += int(row['dosesAdministered'])
+            if row['peopleVaccinated'] == '':
+                peopleDose += 0
+            else:
+                peopleDose += int(row['peopleVaccinated'])
+            if row['completedVaccination'] == '':
+                completeDose += 0
+            else:
+                completeDose += int(row['completedVaccination'])
+
         res = requests.get(
             'https://corona.lmao.ninja/v2/all/')
         world = json.loads(res.text)
         result_text = 'Global Covid data: ' + \
+            "\n------ CASES ------" + \
             '\nCases: ' + str(world['cases']) + \
             '\nToday cases: ' + str(world['todayCases']) + \
             '\nDeaths: ' + str(world['deaths']) + \
             '\nToday deaths: ' + str(world['todayDeaths']) + \
             '\nRecovered: ' + str(world['recovered']) + \
-            '\nToday recovered: ' + str(world['todayRecovered'])
+            '\nToday recovered: ' + str(world['todayRecovered']) + \
+            "\n------ VACCINE ------" + \
+            "\nDose Administered: " + str(totalDose) + \
+            "\nPeople Vaccinated: " + str(peopleDose) + \
+            "\nCompleted Vaccination: " + \
+            str(completeDose)
         flagUrl = 'https://www.nasa.gov/sites/default/files/1-bluemarble_west.jpg'
         flag = ImageSendMessage(
             original_content_url=flagUrl,
@@ -275,18 +305,27 @@ def getStatistic(countryName):
         result = [flag, TextSendMessage(text=result_text)]
     else:
         result = []
-        res = requests.get(
-            'https://corona.lmao.ninja/v2/countries/' + countryName)
+        dict_country = {}
+        for row in dr:
+            if row['name'] == countryName:
+                dict_country = row
+
         country = json.loads(res.text)
         print(country)
         result_text = 'Country: ' + \
             country['country'] + \
+            "\n------ CASES ------" + \
             "\nCases: " + str(country['cases']) + \
             "\nTodayCases: " + str(country['todayCases']) + \
             "\nDeaths: " + str(country['deaths']) + \
             "\nTodayDeaths: " + str(country['todayDeaths']) + \
             "\nRecovered: " + str(country['recovered']) + \
-            "\nTodayRecovered: " + str(country['todayRecovered'])
+            "\nTodayRecovered: " + str(country['todayRecovered']) + \
+            "\n------ VACCINE ------" + \
+            "\nDose Administered: " + str(dict_country['dosesAdministered']) + \
+            "\nPeople Vaccinated: " + str(dict_country['peopleVaccinated']) + \
+            "\nCompleted Vaccination: " + \
+            str(dict_country['completedVaccination'])
         flag = ImageSendMessage(
             original_content_url=country['countryInfo']['flag'],
             preview_image_url=country['countryInfo']['flag'])
