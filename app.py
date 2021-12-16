@@ -164,13 +164,16 @@ def getMoreKnowledge():
         'https://www.who.int/emergencies/diseases/novel-coronavirus-2019/advice-for-public/videos')
     soup = BeautifulSoup(res.text, 'html.parser')
     videos = soup.find('div', attrs={'id': 'PageContent_C054_Col01'})
+    div_text = videos.find_all(
+        'div', attrs={'class': 'section-heading'}, limit=5)
     for num in range(0, 5):
         url = videos.select('iframe')[num]['src']
         soup_url = BeautifulSoup(requests.get(url).text, 'html.parser')
-        title = prepareTitle(soup_url.title.text)
+        title_temp = div_text[num].findChild().getText()
+        title = prepareTitle(title_temp)
         column = CarouselColumn(
             title=title,
-            text='views:' + str(r.incr(title)),
+            text=title,
             actions=[
                 URITemplateAction(
                     label='More',
@@ -329,18 +332,18 @@ def getDonate():
             title='Help Fight Coronavirus',
             text='This donation is for COVID-19 Solidarity Response Fund',
             actions=[
-            URITemplateAction(
-                label='Donate to WHO',
-                uri='https://covid19responsefund.org/'
-            ),
-            URITemplateAction(
-                label='Donate to Africa',
-                uri='http://feedafricafoundation.org/?gclid=Cj0KCQiAnuGNBhCPARIsACbnLzpD-Jm-9pIjrbRqJVyusgvxcGTHwPpAgfP71BOhDr0SUVBbp-YOgO8aAoyREALw_wcB'
-            ),
-            URITemplateAction(
-                label='Donate to Covid Fund',
-                uri='https://quyvacxincovid19.gov.vn/eng'
-            )
+                URITemplateAction(
+                    label='Donate to WHO',
+                    uri='https://covid19responsefund.org/'
+                ),
+                URITemplateAction(
+                    label='Donate to Africa',
+                    uri='http://feedafricafoundation.org/?gclid=Cj0KCQiAnuGNBhCPARIsACbnLzpD-Jm-9pIjrbRqJVyusgvxcGTHwPpAgfP71BOhDr0SUVBbp-YOgO8aAoyREALw_wcB'
+                ),
+                URITemplateAction(
+                    label='Donate to Covid Fund',
+                    uri='https://quyvacxincovid19.gov.vn/eng'
+                )
             ]
         )
     )
@@ -477,7 +480,7 @@ def handle_TextMessage(event):
                                       '-media-squares/blue-4.tmb-1920v.png?sfvrsn=a5317377_5')
             ])
     elif predict_res == 'Outbreak news':
-        msg = 'This is the latest news about COVID-2019, what kinds of information you want to know? '
+        msg = 'This is the outbreak news about COVID-2019, what kinds of information you want to know? '
         menu = Menu2()  # Menu2
         line_bot_api.reply_message(
             event.reply_token, [
