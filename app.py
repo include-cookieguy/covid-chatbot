@@ -33,8 +33,8 @@ REDIS_PASSWORD = None
 REDIS_PORT = 6379
 
 # line bot
-LINE_CHANNEL_SECRET = '03ee235dbfd1933bec1794e374e9eca8'
-LINE_CHANNEL_ACCESS_TOKEN = 'JeXHXi+mRu4EbCjbginNHVDwvL01VXATrJI3jzUn7Brw45/FH6RwfEg512kZzv9THeN2W28ZJUzQPbDIzxp9zBeCHmN0Zk62CZF1mAM0u/y6I8UoBLcBpFRDZcqVzbl1Gpc9WRaVjL6TNovwWw9taQdB04t89/1O/w1cDnyilFU='
+LINE_CHANNEL_SECRET = '41897b9f6d2b35d09d295d996b6f73ff'
+LINE_CHANNEL_ACCESS_TOKEN = 'Pvuhf3MdOaBBEVVERtswnybxPIfpXIDYbxMwNMV1abrI2kYwDI7YZdHqR5xxGSiYL5dvfUK5y74vqFeu/+VFWkH8umWNjhWND+bvIOAZl4HTwE1gLwDDEKvZ2ajxZWPTpOVpV4niz23veIeM+TVPOQdB04t89/1O/w1cDnyilFU='
 
 # deploy heroku
 PORT = ''
@@ -558,9 +558,12 @@ def handle_TextMessage(event):
     elif predict_res == 'Country':
         spell_check = SpellCheck('spell\words.txt')
         spell_check.check(event.message.text)
-
-        line_bot_api.reply_message(
-            event.reply_token, getStatistic(spell_check.suggestions()[0]))
+        if len(spell_check.suggestions()) == 0:
+            line_bot_api.reply_message(
+                event.reply_token, getStatistic('Global'))
+        else:
+            line_bot_api.reply_message(
+                event.reply_token, getStatistic(spell_check.suggestions()[0]))
     elif predict_res == 'Global':
         line_bot_api.reply_message(
             event.reply_token, getStatistic('Global'))
