@@ -31,13 +31,8 @@ REDIS_PASSWORD = None
 REDIS_PORT = 6379
 
 # line bot
-<<<<<<< HEAD
-LINE_CHANNEL_SECRET = '214d08000517e816bc530fad9ddb8be8'
-LINE_CHANNEL_ACCESS_TOKEN = 'sbsJXdNTV3LqDPisIbdLL94VJS25MS6k5miVrsQuwtcwero7sLZTX7AriXc/5HhN5fi22UD7+PDjjjFxR0HWn2uFrBJ0jeeUEmneIuOMqoL4Ibe/1dJ2tYwgH7T6O80tubtRXQIe1qQ0xhsgvNklgQdB04t89/1O/w1cDnyilFU='
-=======
-LINE_CHANNEL_SECRET = '41897b9f6d2b35d09d295d996b6f73ff'
-LINE_CHANNEL_ACCESS_TOKEN = 'Pvuhf3MdOaBBEVVERtswnybxPIfpXIDYbxMwNMV1abrI2kYwDI7YZdHqR5xxGSiYL5dvfUK5y74vqFeu/+VFWkH8umWNjhWND+bvIOAZl4HTwE1gLwDDEKvZ2ajxZWPTpOVpV4niz23veIeM+TVPOQdB04t89/1O/w1cDnyilFU='
->>>>>>> b8884d5c325c91cf00690b1c5acd131e51e681d7
+LINE_CHANNEL_SECRET = '03ee235dbfd1933bec1794e374e9eca8'
+LINE_CHANNEL_ACCESS_TOKEN = 'JeXHXi+mRu4EbCjbginNHVDwvL01VXATrJI3jzUn7Brw45/FH6RwfEg512kZzv9THeN2W28ZJUzQPbDIzxp9zBeCHmN0Zk62CZF1mAM0u/y6I8UoBLcBpFRDZcqVzbl1Gpc9WRaVjL6TNovwWw9taQdB04t89/1O/w1cDnyilFU='
 
 # deploy heroku
 PORT = ''
@@ -169,13 +164,16 @@ def getMoreKnowledge():
         'https://www.who.int/emergencies/diseases/novel-coronavirus-2019/advice-for-public/videos')
     soup = BeautifulSoup(res.text, 'html.parser')
     videos = soup.find('div', attrs={'id': 'PageContent_C054_Col01'})
+    div_text = videos.find_all(
+        'div', attrs={'class': 'section-heading'}, limit=5)
     for num in range(0, 5):
         url = videos.select('iframe')[num]['src']
         soup_url = BeautifulSoup(requests.get(url).text, 'html.parser')
-        title = prepareTitle(soup_url.title.text)
+        title_temp = div_text[num].findChild().getText()
+        title = prepareTitle(title_temp)
         column = CarouselColumn(
             title=title,
-            text='views:' + str(r.incr(title)),
+            text=title,
             actions=[
                 URITemplateAction(
                     label='More',
@@ -304,11 +302,7 @@ def getMythBusters():
     soup = BeautifulSoup(res.text, 'html.parser')
     myths = soup.find('div', attrs={'id': 'PageContent_C003_Col01'})
     # choose five myth busters
-<<<<<<< HEAD
-    for num in range(1, 1):
-=======
     for num in range(1, 8):
->>>>>>> b8884d5c325c91cf00690b1c5acd131e51e681d7
         myths_image = myths.select('.link-container')[num]
         url = myths_image['href']
         check = url.split(':')[0]
@@ -338,18 +332,18 @@ def getDonate():
             title='Help Fight Coronavirus',
             text='This donation is for COVID-19 Solidarity Response Fund',
             actions=[
-            URITemplateAction(
-                label='Donate to WHO',
-                uri='https://covid19responsefund.org/'
-            ),
-            URITemplateAction(
-                label='Donate to Africa',
-                uri='http://feedafricafoundation.org/?gclid=Cj0KCQiAnuGNBhCPARIsACbnLzpD-Jm-9pIjrbRqJVyusgvxcGTHwPpAgfP71BOhDr0SUVBbp-YOgO8aAoyREALw_wcB'
-            ),
-            URITemplateAction(
-                label='Donate to Covid Fund',
-                uri='https://quyvacxincovid19.gov.vn/eng'
-            )
+                URITemplateAction(
+                    label='Donate to WHO',
+                    uri='https://covid19responsefund.org/'
+                ),
+                URITemplateAction(
+                    label='Donate to Africa',
+                    uri='http://feedafricafoundation.org/?gclid=Cj0KCQiAnuGNBhCPARIsACbnLzpD-Jm-9pIjrbRqJVyusgvxcGTHwPpAgfP71BOhDr0SUVBbp-YOgO8aAoyREALw_wcB'
+                ),
+                URITemplateAction(
+                    label='Donate to Covid Fund',
+                    uri='https://quyvacxincovid19.gov.vn/eng'
+                )
             ]
         )
     )
@@ -486,7 +480,7 @@ def handle_TextMessage(event):
                                       '-media-squares/blue-4.tmb-1920v.png?sfvrsn=a5317377_5')
             ])
     elif predict_res == 'Outbreak news':
-        msg = 'This is the latest news about COVID-2019, what kinds of information you want to know? '
+        msg = 'This is the outbreak news about COVID-2019, what kinds of information you want to know? '
         menu = Menu2()  # Menu2
         line_bot_api.reply_message(
             event.reply_token, [
