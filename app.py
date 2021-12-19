@@ -412,6 +412,7 @@ def MainMenu():
 def Menu1():
     buttons_template = ButtonsTemplate(text='1 Popular science', actions=[
         MessageTemplateAction(label='Precaution', text='Precaution'),
+        MessageTemplateAction(label='Myth Busters', text='Myth busters'),
         MessageTemplateAction(label='More Knowledge', text='More knowledge'),
         MessageTemplateAction(label='Main Menu', text='Menu'),
     ])
@@ -426,7 +427,6 @@ def Menu2():
         MessageTemplateAction(label='Situation Report',
                               text='Situation report'),
         MessageTemplateAction(label='Latest News', text='Latest news'),
-        MessageTemplateAction(label='Myth Busters', text='Myth busters'),
         MessageTemplateAction(label='Main Menu', text='Menu'),
     ])
     template_message = TemplateSendMessage(
