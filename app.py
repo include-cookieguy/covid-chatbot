@@ -33,8 +33,8 @@ REDIS_PASSWORD = None
 REDIS_PORT = 6379
 
 # line bot
-LINE_CHANNEL_SECRET = '41897b9f6d2b35d09d295d996b6f73ff'
-LINE_CHANNEL_ACCESS_TOKEN = 'Pvuhf3MdOaBBEVVERtswnybxPIfpXIDYbxMwNMV1abrI2kYwDI7YZdHqR5xxGSiYL5dvfUK5y74vqFeu/+VFWkH8umWNjhWND+bvIOAZl4HTwE1gLwDDEKvZ2ajxZWPTpOVpV4niz23veIeM+TVPOQdB04t89/1O/w1cDnyilFU='
+LINE_CHANNEL_SECRET = '03ee235dbfd1933bec1794e374e9eca8'
+LINE_CHANNEL_ACCESS_TOKEN = 'JeXHXi+mRu4EbCjbginNHVDwvL01VXATrJI3jzUn7Brw45/FH6RwfEg512kZzv9THeN2W28ZJUzQPbDIzxp9zBeCHmN0Zk62CZF1mAM0u/y6I8UoBLcBpFRDZcqVzbl1Gpc9WRaVjL6TNovwWw9taQdB04t89/1O/w1cDnyilFU='
 
 # deploy heroku
 PORT = ''
@@ -90,7 +90,7 @@ parser = WebhookParser(channel_secret)
 
 # GET VACCINE API
 url = 'https://raw.githubusercontent.com/BloombergGraphics/covid-vaccine-tracker-data/master/data/current-global.csv'
-r = requests.get(url)
+responseVaccine = requests.get(url)
 
 
 @app.route("/callback", methods=['POST'])
@@ -265,7 +265,7 @@ def getNews():
 def getStatistic(countryName):
     res = requests.get(
         'https://corona.lmao.ninja/v2/countries/' + countryName)
-    buff = io.StringIO(r.text)
+    buff = io.StringIO(responseVaccine.text)
     dr = csv.DictReader(buff)
     if countryName == 'Global' or countryName == 'World':
         totalDose = 0
@@ -311,7 +311,6 @@ def getStatistic(countryName):
                 dict_country = row
 
         country = json.loads(res.text)
-        print(country)
         result_text = 'Country: ' + \
             country['country'] + \
             "\n------ CASES ------" + \
@@ -489,34 +488,37 @@ def handle_TextMessage(event):
         line_bot_api.reply_message(
             event.reply_token, getMoreKnowledge())
     elif predict_res == 'Wash your hand':
+        arr = ['https://cdnimgen.vietnamplus.vn/uploaded/unvjsai/2020_02_18/20200215_vnboyteruatay3blucnao_c_dn_h84_eng_h84.jpg', 'https://www.jdch.com/-/media/jdch/images/blog/handwashing-infographic.ashx?h=563&w=450&la=en&hash=A992CCDDFB83A70741FC34FA6065A0D3&fbclid=IwAR1r5nQa0aJa1KeQwHRFS7HGizHCum6XfDhYJvybQz2qOWr1WoGAyCq1e5A', 'https://www.who.int/images/default-source/health-topics/coronavirus/social'
+               '-media-squares/blue-1.tmb-1920v.png?sfvrsn=3d15aa1c_1', 'https://www.who.int/images/default-source/health-topics/coronavirus/social'
+               '-media-squares/blue-2.tmb-1920v.png?sfvrsn=2bc43de1_1', 'https://www.afro.who.int/sites/default/files/2020-04/Screen%20Shot%202020-04-30%20at%2015.17.10.png', 'https://www.mandela.ac.za/www-new/media/Store/images/corona/NMU-COVID-19-Hands.jpg']
+        image1 = random.choice(arr)
+        image2 = random.choice(arr)
+        while (image2 == image1):
+            image2 = random.choice(arr)
         line_bot_api.reply_message(
             event.reply_token, [
                 ImageSendMessage(
-                    original_content_url='https://www.who.int/images/default-source/health-topics/coronavirus/social'
-                                         '-media-squares/blue-1.tmb-1920v.png?sfvrsn=3d15aa1c_1 ',
-                    preview_image_url='https://www.who.int/images/default-source/health-topics/coronavirus/social'
-                                      '-media-squares/blue-1.tmb-1920v.png?sfvrsn=3d15aa1c_1 '
-                ),
+                    original_content_url=image1,
+                    preview_image_url=image1),
                 ImageSendMessage(
-                    original_content_url='https://www.who.int/images/default-source/health-topics/coronavirus/social'
-                                         '-media-squares/blue-2.tmb-1920v.png?sfvrsn=2bc43de1_1 ',
-                    preview_image_url='https://www.who.int/images/default-source/health-topics/coronavirus/social'
-                                      '-media-squares/blue-2.tmb-1920v.png?sfvrsn=2bc43de1_1 '
-                ),
+                    original_content_url=image2,
+                    preview_image_url=image2)
             ])
     elif predict_res == 'Protect others':
+        arr = ['https://www.who.int/images/default-source/health-topics/coronavirus/social'
+               '-media-squares/blue-3.tmb-1920v.png?sfvrsn=b1ef6d45_1', 'https://i0.wp.com/iufap.blog/wp-content/uploads/2020/05/protect-yourself.jpeg?fit=909%2C1280&ssl=1', 'https://www.who.int/images/default-source/health-topics/coronavirus/visiting-family.tmb-549v.jpg?sfvrsn=e4652390_11', 'https://ditmasrehab.com/wp-content/uploads/2020/05/Ditmas-Park-COVID-19-Protection-01.jpg?fbclid=IwAR3fNiXtuLNb6kczUKL5wdRf_Wrbnb9cuph8kCTCtnxEWZidkAoEjVd1T48', 'https://www.cdh-malawi.com/images/CoVID-19_-_New_Brief-3-1.jpg', 'https://www.who.int/images/default-source/wpro/infographics/coronavirus-(covid-19)/transmission-slide11.png?sfvrsn=93eea205_0&fbclid=IwAR0C5UzblqLUC8giDF2H9Xuv_5EU60wrq1SXxA3DnxddCWy9MFEb1agwch8', 'https://www.skokie.org/ImageRepository/Document?documentID=4666']
+        image1 = random.choice(arr)
+        image2 = random.choice(arr)
+        while (image2 == image1):
+            image2 = random.choice(arr)
         line_bot_api.reply_message(
             event.reply_token, [
                 ImageSendMessage(
-                    original_content_url='https://www.who.int/images/default-source/health-topics/coronavirus/social'
-                                         '-media-squares/blue-3.tmb-1920v.png?sfvrsn=b1ef6d45_1',
-                    preview_image_url='https://www.who.int/images/default-source/health-topics/coronavirus/social'
-                                      '-media-squares/blue-3.tmb-1920v.png?sfvrsn=b1ef6d45_1'),
+                    original_content_url=image1,
+                    preview_image_url=image1),
                 ImageSendMessage(
-                    original_content_url='https://www.who.int/images/default-source/health-topics/coronavirus/social'
-                                         '-media-squares/blue-4.tmb-1920v.png?sfvrsn=a5317377_5',
-                    preview_image_url='https://www.who.int/images/default-source/health-topics/coronavirus/social'
-                                      '-media-squares/blue-4.tmb-1920v.png?sfvrsn=a5317377_5')
+                    original_content_url=image2,
+                    preview_image_url=image2)
             ])
     elif predict_res == 'Outbreak news':
         msg = 'This is the outbreak news about COVID-2019, what kinds of information you want to know? '
@@ -611,9 +613,6 @@ def handle_LocationMessage(event):
             longitude=ele['longitude'],
         )
         locations.append(temp)
-
-    print('data: ', data)
-    print('location: ', locations)
 
     result_text = '3 hospital around you'
 

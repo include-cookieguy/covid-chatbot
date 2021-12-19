@@ -1,7 +1,7 @@
-0 Menu Show me the menu. Where is the menu. Get started. Start. Hi. Hello.  Where is the menu? menu menu menu menu menu menu menu
+0 Menu Show me the menu. Where is the menu. Get started. What features do you have? Start. Hi. Hello.  Where is the menu? menu menu menu menu menu menu menu
 1 Popular science. What is the popular science. Basic knowledge about covid. What Covid's information should I know. science science science science science science science
-2 Precaution. How to precede covid. What the ways to precede. What are precautions of covid. How to prevent covid. Precaution Precaution Precaution Precaution Precaution Precaution Precaution protect protect protect protect protect protect protect protection protection protection protection protection protection protection  precede precede precede precede precede precede precede 
-3 More knowledge. I want to know more about covid covid19 covid-19 covid covid19 covid-19 covid covid19 covid-19. More information about covid. Show me about covid. Update information covid today. knowledge knowledge knowledge knowledge knowledge knowledge knowledge 
+2 Precaution. How to precede covid. What the ways to precede. What are precautions of covid. How to prevent from infecting Covid disease. Precaution Precaution Precaution Precaution Precaution Precaution Precaution protect protect protect protect protect protect protect protection protection protection protection protection protection protection  precede precede precede precede precede precede precede 
+3 More knowledge. I want to know more about advices for the public public public public public public public covid19 covid-19 covid covid19 covid-19 covid covid19 covid-19. knowledge knowledge knowledge knowledge knowledge knowledge knowledge 
 4 Wash your hands. How to wash my hand. Wash hand right. When should I wash my hand. What to do after coughing or sneezing. wash hand wash hand wash hand wash hand wash hand wash hand wash hand
 5 Protect others. How to protect others from covid. How can I protect other from getting sick. Any advice to protect others from covid. protect others protect others protect others protect others protect others protect others protect others
 6 Outbreak news. What is outbreak news ? what is surprising news today ?  Outbreak news Outbreak news Outbreak news Outbreak news Outbreak news Outbreak news Outbreak news
@@ -12,5 +12,5 @@
 11 Find hospital. find hospital near me? I want to find hospital near me? hospital hospital? What is hospital near me? find hospital near me find hospital near me find hospital near me find hospital near me find hospital near me find hospital near me find hospital near me
 12 Donate. I want to donate to some charity? donate donate donate donate donate donate donate donation donation donation donation donation donation donation 
 13 Country. What about cases today? How about death? recovered of Covid? Today country I want to know how many cases I want to know how many cases I want to know how many cases I want to know how many cases I want to know how many cases are there in country today? How many cases does have today? What is the number of cases in today? cases cases cases cases cases cases case case case case case case case  case case case case case case case
-14 Global Global global global case total case total total total total world world world world world
-15 Statistic Statistic Statistic Statistic Statistic Statistic Statistic Statistic  
+14 Global Global global global cases total cases total total total total world world world world world
+15 Statistic Explore the statistics Statistics Statistics Statistics Statistics Statistic Statistic Statistic  
