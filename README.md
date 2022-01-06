@@ -20,12 +20,8 @@ The chatbot has three major queries: **The popular science knowledge, Latest new
 ### System architecture:
 ![Alt Text](images/architecture.png)
 
-### [Want demo? click here](https://github.com/GeorgeeeLiu/Chatbot/blob/master/Chatbot_Demo.mp4)
-
-<img src="images/Demo.gif" width="400px" height="800px">
-
-### [More screenshots](https://github.com/GeorgeeeLiu/Chatbot/blob/master/screenshots.pdf)
+### [DEMO](https://drive.google.com/file/d/1qx14s55_BqPqoS5_F27-SOAlkIHzOzp6/view?usp=sharing)
 
 ### QR code of the LINE chatbot:
 
-![Alt Text](./images/182wpswj.png)
+![Alt Text](https://drive.google.com/file/d/1OnQcpzUuKxHvltwHc5WqplJvakSYLuf3/view?usp=sharing)
