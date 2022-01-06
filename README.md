@@ -24,4 +24,4 @@ The chatbot has three major queries: **The popular science knowledge, Latest new
 
 ### QR code of the LINE chatbot:
 
-![Alt Text](https://drive.google.com/file/d/1OnQcpzUuKxHvltwHc5WqplJvakSYLuf3/view?usp=sharing)
+![Alt Text](https://res.cloudinary.com/dyywecvyl/image/upload/v1641485628/qr_x4prx3.png)
